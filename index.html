@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kaizen Fiction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070d;--panel:#0b101b;--ink:#e6ebf4;--mute:#8d97a8;--blue:#8fb6ff;--line:#1b2437;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.7 Lora,Georgia,serif}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,.logo,nav a,.btn{font-family:Cinzel,"Times New Roman",serif}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:.6rem 1.5rem;flex-wrap:wrap;padding:.8rem 1.2rem;background:rgba(5,7,13,.93);border-bottom:1px solid var(--line)}
+.logo{font-size:1.2rem;letter-spacing:.07em}
+nav{display:flex;gap:1.3rem;overflow-x:auto}
+nav a{font-size:.8rem;letter-spacing:.05em;color:var(--mute);padding:.3rem 0;border-bottom:1px solid transparent;white-space:nowrap}
+nav a.on,nav a:hover{color:var(--ink);border-color:var(--blue)}
+.hero{position:relative;min-height:70vh;display:grid;place-items:center;text-align:center;padding:4rem 1.2rem 6rem;overflow:hidden;background:radial-gradient(ellipse at 50% 28%,#1c2740 0,#0b1020 46%,#05070d 82%)}
+.hero svg{position:absolute;left:0;bottom:0;width:100%;height:48%}
+.eclipse{position:absolute;top:9%;right:20%;width:78px;height:78px;border-radius:50%;background:#02030a;box-shadow:0 0 0 2px rgba(210,225,255,.35),0 0 50px 10px rgba(150,180,255,.28)}
+.in{position:relative;max-width:40rem}
+.hero h1{font-size:clamp(2.3rem,9vw,4.4rem);font-weight:600;letter-spacing:.04em;line-height:1.1;margin:0 0 .4rem;background:linear-gradient(#fff,#8fa2bf);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{font-family:Cinzel,serif;letter-spacing:.2em;font-size:.85rem;color:#b9c4d8;margin:0 0 1.4rem}
+.hero p.lead{color:#b4bed0;margin:0 auto 1.8rem;max-width:32rem}
+.btn{display:inline-block;border:1px solid #4a5a78;padding:.8rem 1.6rem;font-size:.85rem;letter-spacing:.08em;background:rgba(8,12,22,.7);transition:border-color .2s,background .2s}
+.btn:hover{border-color:var(--blue);background:rgba(20,32,56,.8)}
+main{max-width:60rem;margin:0 auto;padding:2.5rem 1.2rem 4rem}
+.feat{display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem;align-items:center}
+@media(min-width:700px){.feat{grid-template-columns:1fr 1.4fr}}
+.art{aspect-ratio:16/10;border:1px solid var(--line);background:radial-gradient(circle at 70% 35%,#02030a 0 14%,transparent 15%),radial-gradient(circle at 70% 35%,rgba(120,160,255,.35),transparent 42%),linear-gradient(160deg,#0d1424,#05070d)}
+.feat small{color:var(--mute);font-size:.8rem}
+h2{font-size:1.7rem;font-weight:600;letter-spacing:.04em;margin:.2rem 0 .8rem}
+h3{font-weight:600;letter-spacing:.04em;margin:2rem 0 .6rem}
+.mute{color:var(--mute)}
+.more{color:var(--blue);font-size:.95rem}
+.list a{display:flex;justify-content:space-between;gap:1rem;padding:.9rem .2rem;border-bottom:1px solid var(--line)}
+.list a:hover{color:var(--blue)}
+.read{max-width:38rem;margin:0 auto}
+.read p{margin:0 0 1.2em;font-size:1.08rem;line-height:1.9}
+.pn{display:flex;justify-content:space-between;gap:1rem;margin:2.5rem 0 0;font-size:.95rem}
+.yorum{max-width:38rem;margin:3rem auto 0;border-top:1px solid var(--line)}
+footer{border-top:1px solid var(--line);text-align:center;color:var(--mute);font-size:.85rem;padding:1.5rem}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#/">KAIZEN FICTION</a>
+  <nav>
+    <a data-r="" href="#/">Ana Sayfa</a>
+    <a data-r="hikaye" href="#/hikaye">Kai’nin Hikâyesi</a>
+    <a data-r="bolumler" href="#/bolumler">Bölümler</a>
+    <a data-r="hakkinda" href="#/hakkinda">Hakkında</a>
+  </nav>
+</header>
+<div id="app"></div>
+<footer>© Kaizen Fiction</footer>
+
+<script>
+/* ===== AYARLAR ===== */
+// Yorumlar için giscus.app adresinden aldığın dört değeri buraya yaz.
+const G={repo:"",repoId:"",category:"",categoryId:""};
+
+// Bölümler: her satır bir bölüm. "x" içinde boş satır = yeni paragraf.
+const B=[
+ {t:"Bölüm 1: Çöplük",x:"Bu bir örnek bölümdür. index.html içindeki B listesinde bu metni kendi bölümünle değiştir.\n\nBoş bir satır bırakırsan yeni paragraf başlar."},
+ {t:"Bölüm 2: Öteki Taraf",x:"İkinci örnek bölüm. Yeni bölüm eklemek için listeye {t:\"Başlık\",x:\"Metin\"} satırı eklemen yeterli."},
+ {t:"Bölüm 3: Maske",x:"Üçüncü örnek bölüm."}
+];
+/* ==================== */
+
+const app=document.getElementById("app");
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x)e.textContent=x;return e};
+
+function yorum(term){
+  const b=el("section","yorum");b.append(el("h3","","Yorumlar"));
+  if(!G.repo){b.append(el("p","mute","Yorum sistemi henüz bağlanmadı. Dosyanın başındaki G ayarlarını doldurunca burada görünecek."));return b}
+  const s=document.createElement("script");s.src="https://giscus.app/client.js";
+  Object.entries({"data-repo":G.repo,"data-repo-id":G.repoId,"data-category":G.category,"data-category-id":G.categoryId,"data-mapping":"specific","data-term":term,"data-reactions-enabled":"1","data-theme":"dark","data-lang":"tr",crossorigin:"anonymous"}).forEach(([k,v])=>s.setAttribute(k,v));
+  s.async=true;b.append(s);return b;
+}
+
+const pages={
+ "":()=>`<section class="hero"><div class="eclipse"></div>
+  <svg viewBox="0 0 1000 300" preserveAspectRatio="none" aria-hidden="true"><path fill="#04060b" d="M0 300V190l120-60 90 70 110-110 120 100 90-50 130 90 80-70 120-120 140 140V300z"/><path fill="#02040a" d="M640 300V170h14l8-50 8 50h14v-70l10-60 10 60v70h20v-90l12-70 12 70v90h18v-40h20v40h30V300z"/></svg>
+  <div class="in"><h1>Kaizen Fiction</h1><p class="tag">WHERE STORIES BECOME LEGENDS</p>
+  <p class="lead">Karanlık dünyalar, zorlu yolculuklar ve unutulmaz karakterler. Kaizen Fiction’ın özgün hikâyelerini keşfet ve yeni dünyalara adım at.</p>
+  <a class="btn" href="#/hikaye">HİKÂYEYİ KEŞFET</a></div></section>
+  <main><div class="feat"><div class="art" role="img" aria-label="Kai’nin Hikâyesi için kapak alanı"></div>
+  <div><small>Öne çıkan hikâye</small><h2>Kai’nin Hikâyesi</h2>
+  <p>Her dünyanın kendine ait kuralları vardır. Kai ise hayatta kalmak için kendi kurallarını öğrenmek zorundadır. Karanlığın içinde başlayan yolculuğu, onu henüz anlayamadığı tehlikelerle karşı karşıya getirecektir.</p>
+  <a class="more" href="#/bolumler">Hikâyeyi Oku</a></div></div></main>`,
+ hikaye:()=>`<main class="read"><h2>Kai’nin Hikâyesi</h2>
+  <p class="mute">Karanlık fantezi, mizahla dengelenmiş.</p>
+  <p>Kai, bir çöplükte büyümüş, ailesi ve geçmişi belirsiz bir çocuktur. Kimsenin fark etmediği şeyleri fark eder; bir gün zaman durur, göğsünde bir iz belirir ve zorla bilmediği bir dünyaya çekilir.</p>
+  <p>Yeni dünyada gücü yoktur. Elinde yalnızca çöplükte öğrendikleri vardır: sabır, gözlem ve yalan söyleme becerisi. Dışarıdan güçsüz görünürken içinden herkesle alay eder.</p>
+  <p>Bu dünyanın kuralları ise Kai’nin bildiklerinden çok daha tehlikelidir. Hayatta kalmak için güçlenmesi gerekir. Ama her adımın bir bedeli vardır.</p>
+  <h3>Hikâyenin amacı</h3>
+  <p>Kimsenin görmediği bir çocuğun, kendi kurallarını yazarak ne kadar ileri gidebileceğini ve bunun ona neye mal olacağını anlatmak.</p>
+  <p><a class="btn" href="#/bolumler">BÖLÜMLERİ OKU</a></p></main>`,
+ hakkinda:()=>`<main class="read"><h2>Hakkında</h2>
+  <p>Kaizen Fiction, özgün karanlık fantezi hikâyelerin yayınlandığı bir web romanı sitesidir.</p>
+  <p>Hikâyeler bölüm bölüm yayınlanır. Her bölümün altında yorum bırakabilir, fikirlerini ve kuramlarını paylaşabilirsin.</p>
+  <p class="mute">Bu metni kendi tanıtımınla değiştir (index.html, “hakkinda” bölümü).</p></main>`
+};
+
+function route(){
+  const [p,n]=(location.hash.slice(2)||"").split("/");
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.dataset.r===(p==="bolum"?"bolumler":p||"")));
+  window.scrollTo(0,0);app.replaceChildren();
+  if(p==="bolumler"){
+    const m=el("main","read");m.append(el("h2","","Bölümler"));
+    const l=el("div","list");
+    B.forEach((b,i)=>{const a=el("a");a.href="#/bolum/"+i;a.append(el("span","",b.t));l.append(a)});
+    m.append(l);app.append(m);return;
+  }
+  if(p==="bolum"){
+    const i=+n,b=B[i];
+    if(!b){location.hash="#/bolumler";return}
+    const m=el("main","read");
+    m.append(el("p","mute","Kai’nin Hikâyesi"),el("h2","",b.t));
+    b.x.split(/\n\s*\n/).forEach(t=>m.append(el("p","",t)));
+    const nav=el("div","pn"),pr=el("a","more"),nx=el("a","more");
+    pr.textContent=i>0?"← Önceki":"";nx.textContent=i<B.length-1?"Sonraki →":"";
+    if(i>0)pr.href="#/bolum/"+(i-1);if(i<B.length-1)nx.href="#/bolum/"+(i+1);
+    nav.append(pr,nx);m.append(nav);app.append(m,yorum(b.t));return;
+  }
+  app.innerHTML=(pages[p]||pages[""])();
+}
+addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
