@@ -42,6 +42,8 @@ h3{font-weight:600;letter-spacing:.04em;margin:2rem 0 .6rem}
 .read p{margin:0 0 1.2em;font-size:1.08rem;line-height:1.9}
 .pn{display:flex;justify-content:space-between;gap:1rem;margin:2.5rem 0 0;font-size:.95rem}
 .yorum{max-width:38rem;margin:3rem auto 0;padding:0 1.2rem;border-top:1px solid var(--line)}
+.sep{text-align:center;color:var(--mute);margin:2rem 0}
+.read em{font-style:italic}
 footer{border-top:1px solid var(--line);text-align:center;color:var(--mute);font-size:.85rem;padding:1.5rem}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -64,16 +66,29 @@ footer{border-top:1px solid var(--line);text-align:center;color:var(--mute);font
 // Yorumlar için giscus.app adresinden aldığın dört değeri buraya yaz.
 const G={repo:"kaizenfiction/kaizenfiction.github.io",repoId:"R_kgDOVWM0ew",category:"Announcements",categoryId:"DIC_kwDOVWM0e84DJh0Z"};
 
-// Bölümler: her satır bir bölüm. "x" içinde boş satır = yeni paragraf.
-const B=[
- {t:"Bölüm 1: Çöplük",x:"Bu bir örnek bölümdür. index.html içindeki B listesinde bu metni kendi bölümünle değiştir.\n\nBoş bir satır bırakırsan yeni paragraf başlar."},
- {t:"Bölüm 2: Öteki Taraf",x:"İkinci örnek bölüm. Yeni bölüm eklemek için listeye {t:\"Başlık\",x:\"Metin\"} satırı eklemen yeterli."},
- {t:"Bölüm 3: Maske",x:"Üçüncü örnek bölüm."}
-];
+// Bölüm başlıkları liste.txt dosyasında, her satır bir bölüm (1. satır = b1.txt, 2. satır = b2.txt ...).
 /* ==================== */
 
 const app=document.getElementById("app");
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x)e.textContent=x;return e};
+
+
+let B=null;
+async function liste(){
+  if(B)return B;
+  try{const r=await fetch("liste.txt");B=r.ok?(await r.text()).split("\n").map(x=>x.trim()).filter(Boolean):[]}catch(e){B=[]}
+  return B;
+}
+function satir(p,t){
+  t.replace(/'/g,"’").split(/\*([^*]+)\*/).forEach((x,i)=>{if(i%2)p.append(el("em","",x));else if(x)p.append(document.createTextNode(x))});
+  return p;
+}
+async function bolumYaz(m,i){
+  try{
+    const r=await fetch("b"+(i+1)+".txt");if(!r.ok)throw 0;
+    (await r.text()).trim().split(/\n\s*\n/).forEach(t=>{t=t.trim();if(!t)return;m.append(t==="---"?el("div","sep","✦"):satir(el("p"),t.replace(/\n/g," ")))});
+  }catch(e){m.append(el("p","mute","Bölüm yüklenemedi. Sayfayı yenile."))}
+}
 
 function yorum(term){
   const b=el("section","yorum");b.append(el("h3","","Yorumlar"));
@@ -112,21 +127,26 @@ function route(){
   document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.dataset.r===(p==="bolum"?"bolumler":p||"")));
   window.scrollTo(0,0);app.replaceChildren();
   if(p==="bolumler"){
-    const m=el("main","read");m.append(el("h2","","Bölümler"));
-    const l=el("div","list");
-    B.forEach((b,i)=>{const a=el("a");a.href="#/bolum/"+i;a.append(el("span","",b.t));l.append(a)});
-    m.append(l);app.append(m);return;
+    const m=el("main","read");m.append(el("h2","","Bölümler"));app.append(m);
+    liste().then(L=>{
+      if(!L.length){m.append(el("p","mute","Henüz bölüm yayınlanmadı."));return}
+      const l=el("div","list");
+      L.forEach((t,i)=>{const a=el("a");a.href="#/bolum/"+i;a.append(el("span","",t));l.append(a)});
+      m.append(l);
+    });return;
   }
   if(p==="bolum"){
-    const i=+n,b=B[i];
-    if(!b){location.hash="#/bolumler";return}
-    const m=el("main","read");
-    m.append(el("p","mute","Kai’nin Hikâyesi"),el("h2","",b.t));
-    b.x.split(/\n\s*\n/).forEach(t=>m.append(el("p","",t)));
-    const nav=el("div","pn"),pr=el("a","more"),nx=el("a","more");
-    pr.textContent=i>0?"← Önceki":"";nx.textContent=i<B.length-1?"Sonraki →":"";
-    if(i>0)pr.href="#/bolum/"+(i-1);if(i<B.length-1)nx.href="#/bolum/"+(i+1);
-    nav.append(pr,nx);m.append(nav);app.append(m,yorum(b.t));return;
+    const i=+n,m=el("main","read");app.append(m);
+    liste().then(async L=>{
+      if(!L[i]){location.hash="#/bolumler";return}
+      m.append(el("p","mute","Kai’nin Hikâyesi"),el("h2","",L[i]));
+      await bolumYaz(m,i);
+      if(app.firstChild!==m)return;
+      const nav=el("div","pn"),pr=el("a","more"),nx=el("a","more");
+      pr.textContent=i>0?"← Önceki":"";nx.textContent=i<L.length-1?"Sonraki →":"";
+      if(i>0)pr.href="#/bolum/"+(i-1);if(i<L.length-1)nx.href="#/bolum/"+(i+1);
+      nav.append(pr,nx);m.append(nav);app.append(yorum("Bölüm "+(i+1)));
+    });return;
   }
   app.innerHTML=(pages[p]||pages[""])();
 }
